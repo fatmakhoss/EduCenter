@@ -1,5 +1,6 @@
 <?php
 
+// app/Providers/RouteServiceProvider.php
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
@@ -9,22 +10,26 @@ class RouteServiceProvider extends ServiceProvider
 {
     public const HOME = '/home';
 
-    /**
-     * Define your route model bindings, pattern filters, and other route configuration.
-     */
-    public function boot(): void
+    protected $namespace = 'App\Http\Controllers';
+
+    public function boot()
     {
-        RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
-        });
+        parent::boot();
+    }
 
-        $this->routes(function () {
-            Route::middleware('api')
-                ->prefix('api')
-                ->group(base_path('routes/api.php'));
+    public function map()
+    {
+        $this->mapApiRoutes();
+        $this->mapWebRoutes();
+    }
 
-            Route::middleware('web')
-                ->group(base_path('routes/web.php'));
-        });
+    protected function mapWebRoutes()
+    {
+        Route::middleware('web')->namespace($this->namespace)->group(base_path('routes/web.php'));
+    }
+
+    protected function mapApiRoutes()
+    {
+        Route::prefix('api')->middleware('api')->namespace($this->namespace)->group(base_path('routes/api.php'));
     }
 }
