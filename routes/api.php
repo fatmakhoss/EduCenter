@@ -32,8 +32,8 @@ Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
 
 // Routes protégées par Sanctum
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/inscriptions', [InscriptionController::class, 'index']);
-    Route::put('/inscriptions/{id}/status', [InscriptionController::class, 'updateStatus']);
+    Route::get('/inscription', [InscriptionController::class, 'index']);
+    Route::put('/inscription/{id}/status', [InscriptionController::class, 'updateStatus']);
 });
 Route::post('/password/email', [AuthController::class, 'forgotPassword']);
 Route::post('/password/reset', [AuthController::class, 'resetPassword']);
