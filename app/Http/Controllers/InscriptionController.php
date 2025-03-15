@@ -57,7 +57,8 @@ class InscriptionController extends Controller
             ];
         });
         
-        return response()->json(['registrations' => $formattedInscriptions]);
+        // Retourner directement le tableau sans le wrapper "registrations"
+        return response()->json($formattedInscriptions);
     }
 
     public function updateStatus(Request $request, $id)

@@ -16,6 +16,8 @@ class AuthController extends Controller
     // Connexion
     public function login(Request $request)
     {
+        Log::info('Requête de connexion reçue:', $request->all());
+        
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -23,22 +25,33 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        Log::info('Tentative de connexion :', ['email' => $credentials['email']]);
+        Log::info('Tentative de connexion avec:', ['email' => $credentials['email']]);
 
         $user = User::where('email', $credentials['email'])->first();
 
         if (!$user) {
-            Log::warning('Utilisateur non trouvé :', ['email' => $credentials['email']]);
+            Log::warning('Utilisateur non trouvé:', ['email' => $credentials['email']]);
             return response()->json(['message' => 'Identifiants incorrects : Email non trouvé'], 401);
         }
 
+        Log::info('Utilisateur trouvé:', [
+            'email' => $user->email, 
+            'role' => $user->role, 
+            'verified' => $user->hasVerifiedEmail(),
+            'isAdmin' => $user->isAdmin()
+        ]);
+
         if (!$user->hasVerifiedEmail() && !$user->isAdmin()) {
-            Log::warning('Email non vérifié :', ['email' => $user->email, 'role' => $user->role]);
-            return response()->json(['message' => 'Veuillez activer votre email d’abord'], 403);
+            Log::warning('Email non vérifié:', ['email' => $user->email, 'role' => $user->role]);
+            return response()->json(['message' => 'Veuillez activer votre email d\'abord'], 403);
         }
 
         if (!Hash::check($credentials['password'], $user->password)) {
-            Log::warning('Mot de passe incorrect :', ['email' => $user->email]);
+            Log::warning('Mot de passe incorrect:', [
+                'email' => $user->email,
+                'password_input' => $credentials['password'],
+                'password_stored_length' => strlen($user->password)
+            ]);
             return response()->json(['message' => 'Identifiants incorrects : Mot de passe erroné'], 401);
         }
 
@@ -74,11 +87,11 @@ class AuthController extends Controller
 
         $status = Password::sendResetLink($request->only('email'));
 
-        Log::info('Statut de l’oubli de mot de passe :', ['status' => $status]);
+        Log::info('Statut de l\'oubli de mot de passe :', ['status' => $status]);
 
         return $status === Password::RESET_LINK_SENT
             ? response()->json(['message' => 'Un lien de réinitialisation a été envoyé à votre email'], 200)
-            : response()->json(['message' => 'Échec de l’envoi du lien de réinitialisation'], 400);
+            : response()->json(['message' => 'Échec de l\'envoi du lien de réinitialisation'], 400);
     }
 
     // Réinitialisation du mot de passe

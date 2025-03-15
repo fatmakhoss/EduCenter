@@ -11,9 +11,7 @@ class RegistrationController extends Controller
     public function index()
     {
         $registrations = CourseRegistration::orderBy('created_at', 'desc')->get();
-        return response()->json([
-            'registrations' => $registrations
-        ]);
+        return response()->json($registrations);
     }
 
     public function updateStatus(Request $request, $id)
