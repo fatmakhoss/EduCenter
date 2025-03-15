@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\LangueController;
 use App\Http\Controllers\InscriptionController;
 use App\Models\User;
+use App\Http\Controllers\CourseRegistrationController;
 
 // Route d'authentification
 Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -37,3 +38,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 Route::post('/password/email', [AuthController::class, 'forgotPassword']);
 Route::post('/password/reset', [AuthController::class, 'resetPassword']);
+
+Route::post('/course-registration', [CourseRegistrationController::class, 'register']);
+
+// Routes protégées pour l'administration
+Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/registrations', [App\Http\Controllers\Admin\RegistrationController::class, 'index']);
+    Route::put('/registrations/{id}/status', [App\Http\Controllers\Admin\RegistrationController::class, 'updateStatus']);
+});
