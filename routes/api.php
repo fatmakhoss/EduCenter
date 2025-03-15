@@ -14,6 +14,9 @@ Route::get('/langue', [LangueController::class, 'index']);
 Route::get('/langue/{nom}', [LangueController::class, 'show']);
 Route::post('/inscription', [InscriptionController::class, 'store']);
 
+// Route pour la compatibilité avec l'ancien endpoint d'inscription aux cours
+Route::post('/course-registration', [CourseRegistrationController::class, 'register']);
+
 // Route لتفعيل الإيميل
 Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
     $user = User::findOrFail($id);
@@ -43,12 +46,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/inscription', [InscriptionController::class, 'index']);
         Route::put('/inscription/{id}/status', [InscriptionController::class, 'updateStatus']);
         
-        // Route pour les inscriptions aux cours
+        // Route pour la rétrocompatibilité avec l'ancien endpoint
         Route::get('/course-registration', [CourseRegistrationController::class, 'index']);
     });
 });
-
-Route::post('/course-registration', [CourseRegistrationController::class, 'register']);
 
 // Routes protégées pour l'administration
 Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {

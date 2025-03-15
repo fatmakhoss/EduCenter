@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\CourseRegistration;
+use App\Models\Inscription;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
@@ -28,14 +28,22 @@ class CourseRegistrationController extends Controller
         }
 
         try {
+            // Obtenir les IDs de langue et niveau à partir des noms
+            $langue_id = 1; // Valeur par défaut, à adapter
+            $niveau_id = 1; // Valeur par défaut, à adapter
+            
+            // Si la langue ou le niveau sont disponibles par nom, il faudrait récupérer leur ID
+            // Exemple: $langue = Langue::where('nom', $request->course)->first();
+            // if ($langue) $langue_id = $langue->id;
+            
             // Enregistrer l'inscription
-            $registration = CourseRegistration::create([
-                'full_name' => $request->fullName,
+            $registration = Inscription::create([
+                'name' => $request->fullName,
                 'email' => $request->email,
-                'country' => $request->country,
-                'phone' => $request->phone,
-                'level' => $request->level,
-                'course' => $request->course,
+                'pays' => $request->country,
+                'telephone' => $request->phone,
+                'langue_id' => $langue_id,
+                'niveau_id' => $niveau_id,
                 'status' => 'pending'
             ]);
 
@@ -58,10 +66,27 @@ class CourseRegistrationController extends Controller
     public function index()
     {
         try {
-            $registrations = CourseRegistration::all();
+            $inscriptions = Inscription::with('langue', 'niveau')->get();
+            
+            // Transformer les données au format attendu par le frontend
+            $formattedInscriptions = $inscriptions->map(function ($inscription) {
+                return [
+                    'id' => $inscription->id,
+                    'full_name' => $inscription->name,
+                    'email' => $inscription->email,
+                    'country' => $inscription->pays,
+                    'phone' => $inscription->telephone,
+                    'course' => $inscription->langue->nom ?? 'N/A',
+                    'level' => $inscription->niveau->nom ?? 'N/A',
+                    'status' => $inscription->status,
+                    'created_at' => $inscription->created_at,
+                    'updated_at' => $inscription->updated_at,
+                ];
+            });
+            
             return response()->json([
                 'success' => true,
-                'registrations' => $registrations
+                'registrations' => $formattedInscriptions
             ]);
         } catch (\Exception $e) {
             return response()->json([
