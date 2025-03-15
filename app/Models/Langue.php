@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Langue extends Model
 {
     use HasFactory;
-    protected $fillable = ['nom']; // الأعمدة اللي يمكن تكتب فيها
+    protected $fillable = ['nom', 'code', 'description', 'active']; // الأعمدة اللي يمكن تكتب فيها
 
     // ارتباط مع Niveau (إذا لازم)
     public function niveaux()

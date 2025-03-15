@@ -40,7 +40,24 @@ class InscriptionController extends Controller
     public function index()
     {
         $inscriptions = Inscription::with('langue', 'niveau')->get();
-        return response()->json($inscriptions);
+        
+        // Transformer les données au format attendu par le frontend
+        $formattedInscriptions = $inscriptions->map(function ($inscription) {
+            return [
+                'id' => $inscription->id,
+                'full_name' => $inscription->name,
+                'email' => $inscription->email,
+                'country' => $inscription->pays,
+                'phone' => $inscription->telephone,
+                'course' => $inscription->langue->nom ?? 'N/A',
+                'level' => $inscription->niveau->nom ?? 'N/A',
+                'status' => $inscription->status,
+                'created_at' => $inscription->created_at,
+                'updated_at' => $inscription->updated_at,
+            ];
+        });
+        
+        return response()->json(['registrations' => $formattedInscriptions]);
     }
 
     public function updateStatus(Request $request, $id)

@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('langues')){
         Schema::create('langues', function (Blueprint $table) {
             $table->id();
-            $table->string('nom', 150)->unique();
+            $table->string('nom');
+            $table->string('code')->unique();
+            $table->string('description')->nullable();
+            $table->boolean('active')->default(true);
             $table->timestamps();
         });
     }
-}
 
     /**
      * Reverse the migrations.

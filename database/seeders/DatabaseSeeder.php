@@ -22,5 +22,29 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminSeeder::class,
         ]);
+
+        // Create admin user
+        \App\Models\User::create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'password' => bcrypt('password'),
+            'email_verified_at' => now(),
+            'role' => 'admin',
+        ]);
+
+        // Add languages
+        \App\Models\Langue::create([
+            'nom' => 'Français',
+            'code' => 'fr',
+            'description' => 'Langue française',
+            'active' => true,
+        ]);
+
+        \App\Models\Langue::create([
+            'nom' => 'Anglais',
+            'code' => 'en',
+            'description' => 'Langue anglaise',
+            'active' => true,
+        ]);
     }
 }

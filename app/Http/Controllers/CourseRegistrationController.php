@@ -54,4 +54,21 @@ class CourseRegistrationController extends Controller
             ], 500);
         }
     }
+
+    public function index()
+    {
+        try {
+            $registrations = CourseRegistration::all();
+            return response()->json([
+                'success' => true,
+                'registrations' => $registrations
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de la récupération des inscriptions',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 } 

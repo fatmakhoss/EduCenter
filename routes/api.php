@@ -33,11 +33,20 @@ Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
 
 // Routes protégées par Sanctum
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/inscription', [InscriptionController::class, 'index']);
-    Route::put('/inscription/{id}/status', [InscriptionController::class, 'updateStatus']);
+    // Routes pour tous les utilisateurs authentifiés
+    Route::post('/password/email', [AuthController::class, 'forgotPassword']);
+    Route::post('/password/reset', [AuthController::class, 'resetPassword']);
+
+    // Routes pour les administrateurs uniquement
+    Route::middleware(['admin'])->group(function () {
+        // Route pour récupérer toutes les inscriptions (admin)
+        Route::get('/inscription', [InscriptionController::class, 'index']);
+        Route::put('/inscription/{id}/status', [InscriptionController::class, 'updateStatus']);
+        
+        // Route pour les inscriptions aux cours
+        Route::get('/course-registration', [CourseRegistrationController::class, 'index']);
+    });
 });
-Route::post('/password/email', [AuthController::class, 'forgotPassword']);
-Route::post('/password/reset', [AuthController::class, 'resetPassword']);
 
 Route::post('/course-registration', [CourseRegistrationController::class, 'register']);
 
